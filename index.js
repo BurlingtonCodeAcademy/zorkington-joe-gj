@@ -10,6 +10,14 @@ function ask(questionText) {
 /*-------------------------Constants----------------------------------*/
 
 /*--------------------------Rooms------------------------------------*/
+class Room {
+  constructor(name, desc, inv) {
+    this.name = name
+    this.desc = desc
+    this.inv = inv
+    this.locked = false
+  }
+}
 
 /*------------------------Gameplay Functions-------------------------*/
 function cleanWords(word) {
