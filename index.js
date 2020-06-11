@@ -1,39 +1,39 @@
+/* --------------------------------Readline------------------------------------*/
 const readline = require('readline');
 const readlineInterface = readline.createInterface(process.stdin, process.stdout);
-
 function ask(questionText) {
   return new Promise((resolve, reject) => {
     readlineInterface.question(questionText, resolve);
   });
 }
 
-// remember the StateMachine lecture
-// https://bootcamp.burlingtoncodeacademy.com/lessons/cs/state-machines
-let states = {
-  'roomOne': { canChangeTo: [ 'roomTwo' ] },
-  'roomTwo': { canChangeTo: [ 'roomThree' ] },
-  'roomThree': { canChangeTo: [ 'roomOne' ] }
-};
+/*-------------------------Constants----------------------------------*/
 
-let currentState = "green";
+/*--------------------------Rooms------------------------------------*/
 
-function enterState(newState) {
-  let validTransitions = states[currentState].canChangeTo;
-  if (validTransitions.includes(newState)) {
-    currentState = newState;
-  } else {
-    throw 'Invalid state transition attempted - from ' + currentState + ' to ' + newState;
-  }
+/*------------------------Gameplay Functions-------------------------*/
+function cleanWords(word) {
+  let steralize = word.toString().trim().toLowerCase()
+  return steralize
 }
 
-start();
+/*----------------------------Player-------------------------------*/
+const player = {
+  inventory: [],
+  location: null
+}
 
-async function start() {
-  const welcomeMessage = `182 Main St.
-You are standing on Main Street between Church and South Winooski.
-There is a door here. A keypad sits on the handle.
-On the door is a handwritten sign.`;
-  let answer = await ask(welcomeMessage);
-  console.log('Now write your code to make this work!');
-  process.exit();
+/*----------------------Look up tables and State Machine--------*/
+
+/*----------------------------------Story--------------------------------------------*/
+async function intro() {
+  const introMessage = `Welcome to the Zombie Apocalypse! Zombies are all around and closing in fast! Please word your actions in a [action] + [Item/Room] format`
+  let startPrompt = await ask(introMessage + '\n' + 'Do you understand?\n>_')
+  let cleanStart = cleanWords(startPrompt)
+  if (cleanStart === 'yes') {
+    start();
+  } else {
+    console.log("Probably best to try a different game then. Good Bye.")
+    process.exit();
+  }
 }
