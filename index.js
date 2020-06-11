@@ -33,7 +33,7 @@ async function intro() {
   if (cleanStart === 'yes') {
     start();
   } else {
-    console.log("Probably best to try a different game then. Good Bye.")
+    console.log("Come back when you're ready then!")
     process.exit();
   }
 }
