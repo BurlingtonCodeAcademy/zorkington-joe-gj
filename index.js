@@ -79,16 +79,15 @@ const bathRoom = new Room(
 mansion.locked = true;
 
 let roomLookUp = {
-  'outside' : outside,
-  'kitchen' : kitchen,
-  'livingRoom' : livingRoom,
-  'gazebo' : gazebo,
-  'mansion' : mansion,
-  'ballRoom' : ballRoom,
-  'bedRoom' : bedRoom,
-  'bathRoom' : bathRoom,
-  
-}
+  outside: outside,
+  kitchen: kitchen,
+  livingRoom: livingRoom,
+  gazebo: gazebo,
+  mansion: mansion,
+  ballRoom: ballRoom,
+  bedRoom: bedRoom,
+  bathRoom: bathRoom,
+};
 
 /*------------------------Gameplay Functions-------------------------*/
 function cleanWords(word) {
@@ -98,19 +97,28 @@ function cleanWords(word) {
 
 function zombieHoarde() {
   if (player.encroacment >= 0) {
-    player.encroacment = player.encroacment - 1
+    player.encroacment = player.encroacment - 1;
     if (player.encroacment === 12) {
-      console.log("You can hear the sound the zombie hoarde growing louder and louder")
-    } if (player.encroacment <= 6 && player.encroacment > 0) {
-      console.log("You can see the zombies slowly moving towards you, they are now focused on you!")
-    } if (player.encroacment === 0) {
-      console.log("The zombies have gotten you and added you to their ranks. Enjoy the brains!")
-      process.exit()
+      console.log(
+        "You can hear the sound the zombie hoarde growing louder and louder"
+      );
+    }
+    if (player.encroacment <= 6 && player.encroacment > 0) {
+      console.log(
+        "You can see the zombies slowly moving towards you, they are now focused on you!"
+      );
+    }
+    if (player.encroacment === 0) {
+      console.log(
+        "The zombies have gotten you and added you to their ranks. Enjoy the brains!"
+      );
+      process.exit();
     }
   }
 }
 
-/*-----------------------------------------Player----------------------------------------*/
+
+/*----------------------------Player-------------------------------*/
 const player = {
   inventory: [],
   location: null,
@@ -118,6 +126,7 @@ const player = {
 };
 
 /*----------------------------------------Items---------------------------------------------------------------*/
+//class constructor
 class Item {
   constructor(name, desc, takable, action) {
     this.name = name;
@@ -126,6 +135,8 @@ class Item {
     this.action = action;
   }
 }
+
+//item class
 const note = new Item(
   "Note",
   'Hand written note that is attached the entry gate that reads ,"We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will let get through the door at the end of the cul-de-sac and into the tunnel and make your way to Paradise Cove and make sure to throw the key into the corner for others to find and re-lock hatch the "',
@@ -174,6 +185,60 @@ const rug = new Item(
 const padlock = new Item("Padlock", "Just a standard pad lock.", true, () => {
   /* write a function to unlock padlock*/
 });
+
+//lookup table
+let itemLookUp = {
+  note: note,
+  backpack: backpack,
+  key: key,
+  flashlight: flashlight,
+  runningShoes: runningShoes,
+  rug: rug,
+  padlock: padlock,
+};
+
+//---------------------State Machine------------------------------------------------- */
+let enterRooms = {
+  'outside': {
+    canChangeTo: ['kitchen']
+  },
+  'kitchen': {
+    canChangeTo: ['outside', 'livingRoom', 'gazebo']
+  },
+  'livingRoom': {
+    canChangeTo: ['kitchen']
+  },
+  'gazebo': {
+    canChangeTo: ['mansion', 'kitchen', 'ballRoom']
+  },
+  'mansion': {
+    canChangeTo: ['gazebo']
+  },
+  'ballRoom': {
+    canChangeTo: ['bedRoom', 'gazebo']
+  },
+  'bedRoom': {
+    canChangeTo: ['bathRoom', 'ballRoom']
+  }
+}
+let currentRoom = 'outside'
+
+function changeRooms(newRoom) {
+  let roomTransitions = enterRooms[currentRoom].canChangeTo;
+  if (roomLookUp[newRoom].locked === true) {
+    console.log('The door is locked, move along!');
+  } else if (roomTransitions.includes(newRoom)) {
+    currentRoom = newRoom;
+    let stateForTable = roomLookUp[currentRoom]
+    console.log(stateForTable.desc);
+    zombieHoarde()
+    console.log("You better hurry up they're getting closer!" + player.encroacment);
+    player.location = roomLookUp[currentRoom]
+  } else {
+    console.log('You can not make that move from' + currentRoom + 'to' + newRoom)
+  }
+}
+
 /*----------------------------------Story--------------------------------------------*/
 async function intro() {
   const introMessage = `Welcome to the Zombie Apocalypse! Zombies are all around and closing in fast! Please word your actions in a [action] + [Item/Room] format`;
@@ -186,11 +251,13 @@ async function intro() {
     process.exit();
   }
 }
-intro()
+
+intro();
+
 async function start() {
   const startMessage = `After some time running through woods, you come upon a gated community that looks to overrun and long abandoned. The gate is loosely held together by some rusted chains with a note that reads: “We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will unlock the mansion at the end of the cul-de-sac and will give you access to the tunnel and make your way to Paradise Cove. Hurry, once the gates are open there is no way to close them and ‘they’ will get in!
   
-  What would like you to do?`
+  What would like you to do?`;
 
   console.log(startMessage);
   player.location = outside
@@ -217,8 +284,8 @@ async function start() {
         })
       }
     } else if (actions.move.includes(command)) {
-      enterState(activity)
-    } 
+      changeRooms(activity)
+    }
     else {
       console.log("I'm not too sure how to do " + cleanInput + ". Care to try again?")
     }
