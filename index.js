@@ -65,12 +65,12 @@ const ballRoom = new Room(
   "Enter through the north. The  Ballroom is a grand space. The walls are end to end dark cherry wood, that slope up and fade into a grand arched ceiling that is adorned with what appears to be an ornate copper dome much like you would see in old architecture. Due to the elemental exposure the copper has oxidized and turned a dull green color. There is a massive crystal chandelier that has smashed to the floor. The south wall is also empty but contains a glass wall that slides all the way across the room into a courtyard with an Olympic size swimming pool that disappears into the part of the house. The huge bank of glass appears to be covered in old blood.  The west wall is empty. The east wall contains 2 large cherry double doors, which open into a master bedroom and bathroom.",
   []
 );
-const bedroom = new Room(
+const bedRoom = new Room(
   "Bedroom",
   "Bedroom off of the Ballroom is quite possibly the biggest bedroom you’ve ever seen. It is bigger than some houses. The East wall is empty except for the doors and an outline of what was most likely a painting that's about 12 feet in size.On the south wall there is another wall of windows that can be opened up.Much like the windows in the Living room they are strewn with old dried up blood.The west wall contains the remnants of what used to be a bed.The mattress is all torn to shreds and is all black with mold.The north wall contains another set of cherry double doors which opens into a huge master bathroom.",
   []
 );
-const bathroom = new Room(
+const bathRoom = new Room(
   "bathroom",
   "You enter through the north and the bathroom is floor to ceiling White Italian Marble. On the east wall there's a large double sink coming out of the wall that’s long enough to lay down in.The west wall contains a single cherry door that is locked.Oddly there is no toilet in the bathroom.The whole south side of the bathroom is a massive glassed walk -in shower.There must be 100 wall and ceiling water jets in the shower room.On the floor there’s an out of place looking cheap throw rug.You move the throw to discover a grate in the floor just big enough for a man to fit in that’s padlocked shut. Use the key to open the lock and enter the tunnel to exit.",
   [rug, padlock]
@@ -110,14 +110,14 @@ function zombieHoarde() {
   }
 }
 
-/*----------------------------Player-------------------------------*/
+/*-----------------------------------------Player----------------------------------------*/
 const player = {
   inventory: [],
   location: null,
   encroacment: 20,
 };
 
-/*----------------------Look up tables and State Machine--------*/
+/*----------------------------------------Items---------------------------------------------------------------*/
 class Item {
   constructor(name, desc, takable, action) {
     this.name = name;
@@ -193,4 +193,35 @@ async function start() {
   What would like you to do?`
 
   console.log(startMessage);
+  player.location = outside
+  while (player.encroachment > 0) {
+    let dirtyInput = await ask('>_')
+    let cleanInput = cleanWords(dirtyInput)
+    let cleanArray = cleanInput.split(' ')
+    let command = cleanArray[0]
+    let activity = cleanArray[cleanArray.length - 1]
+    if (cleanInput === 'i') {
+      if (player.location.inv.length === 0) {
+        console.log("There is nothing here")
+      } else {
+        player.location.inv.forEach(function (obj) {
+          console.log(obj)
+        })
+      }
+    } else if (cleanInput === 'c') {
+      if (player.inventory.length === 0) {
+        console.log("There is nothing in your pockets.")
+      } else {
+        player.inventory.forEach(function (obj) {
+          console.log(obj)
+        })
+      }
+    } else if (actions.move.includes(command)) {
+      enterState(activity)
+    } 
+    else {
+      console.log("I'm not too sure how to do " + cleanInput + ". Care to try again?")
+    }
+  }
 }
+
