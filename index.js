@@ -34,6 +34,15 @@ const player = {
 }
 
 /*----------------------Look up tables and State Machine--------*/
+class Item {
+  constructor(name, desc, takable, action) {
+    this.name = name;
+    this.desc = desc;
+    this.takable = takable;
+    this.action = action
+  }
+}
+
 
 /*----------------------------------Story--------------------------------------------*/
 async function intro() {
