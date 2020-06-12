@@ -159,6 +159,16 @@ const rug = new Item(
 const padlock = new Item("Padlock", "Just a standard pad lock.", true, () => {
   /* write a function to unlock padlock*/
 });
+//---------------------lookup table for Items------------------------------------------------- */
+let itemLookUp = {
+  note: note,
+  backpack: backpack,
+  key: key,
+  flashlight: flashlight,
+  runningShoes: runningShoes,
+  rug: rug,
+  padlock: padlock,
+};
 /*----------------------------------Story--------------------------------------------*/
 async function intro() {
   const introMessage = `Welcome to the Zombie Apocalypse! Zombies are all around and closing in fast! Please word your actions in a [action] + [Item/Room] format`;
