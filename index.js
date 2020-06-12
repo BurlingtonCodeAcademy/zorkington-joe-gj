@@ -79,16 +79,16 @@ const bathroom = new Room(
 mansion.locked = true;
 
 let roomLookUp = {
-  gate: gate,
-  outside: outside,
-  livingRoom: livingRoom,
-  kitchen: kitchen,
-  gazebo: gazebo,
-  ballRoom: ballRoom,
-  bedRoom: bedRoom,
-  bathRoom: bathRoom,
-  mansion: mansion,
-};
+  'outside' : outside,
+  'kitchen' : kitchen,
+  'livingRoom' : livingRoom,
+  'gazebo' : gazebo,
+  'mansion' : mansion,
+  'ballRoom' : ballRoom,
+  'bedRoom' : bedRoom,
+  'bathRoom' : bathRoom,
+  
+}
 
 /*------------------------Gameplay Functions-------------------------*/
 function cleanWords(word) {
@@ -96,10 +96,25 @@ function cleanWords(word) {
   return steralize;
 }
 
+function zombieHoarde() {
+  if (player.encroacment >= 0) {
+    player.encroacment = player.encroacment - 1
+    if (player.encroacment === 12) {
+      console.log("You can hear the sound the zombie hoarde growing louder and louder")
+    } if (player.encroacment <= 6 && player.encroacment > 0) {
+      console.log("You can see the zombies slowly moving towards you, they are now focused on you!")
+    } if (player.encroacment === 0) {
+      console.log("The zombies have gotten you and added you to their ranks. Enjoy the brains!")
+      process.exit()
+    }
+  }
+}
+
 /*----------------------------Player-------------------------------*/
 const player = {
   inventory: [],
   location: null,
+  encroacment: 20,
 };
 
 /*----------------------Look up tables and State Machine--------*/
@@ -180,4 +195,12 @@ async function intro() {
     console.log("Come back when you're ready then!");
     process.exit();
   }
+}
+intro()
+async function start() {
+  const startMessage = `After some time running through woods, you come upon a gated community that looks to overrun and long abandoned. The gate is loosely held together by some rusted chains with a note that reads: “We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will unlock the mansion at the end of the cul-de-sac and will give you access to the tunnel and make your way to Paradise Cove. Hurry, once the gates are open there is no way to close them and ‘they’ will get in!
+  
+  What would like you to do?`
+
+  console.log(startMessage);
 }
