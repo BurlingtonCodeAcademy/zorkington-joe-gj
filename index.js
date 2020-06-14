@@ -118,179 +118,190 @@ function zombieHoarde() {
 }
 
 function takeItem() {
-  if (item.takable === item.desc) {
-    return ('Would you like to put this item in your back pack?');
+  if (this.takable) {
+    inventory.push(item.name)
+    return 'You picked up ${this.name}'
+  } else {
+    return "You can't take that!"
+  }
+}
 
+function use() {
+  if (this.name === 'padlock' && inventory.includes('key')) {
+    return 'You unlocked the padlock! Now quickly make your way into the tunnel and make your way to Paradise Cove'
+  } else {
+    return this.action('You need the key to do that')
+  }
+}
 
+/*----------------------------Player-------------------------------*/
+const player = {
+  inventory: [],
+  location: null,
+  encroacment: 20,
+};
 
-    /*----------------------------Player-------------------------------*/
-    const player = {
-      inventory: [],
-      location: null,
-      encroacment: 20,
-    };
+/*----------------------------------------Items---------------------------------------------------------------*/
+//class constructor
+class Item {
+  constructor(name, desc, takable, action) {
+    this.name = name;
+    this.desc = desc;
+    this.takable = takable;
+    this.action = action;
+  }
+}
 
-    /*----------------------------------------Items---------------------------------------------------------------*/
-    //class constructor
-    class Item {
-      constructor(name, desc, takable, action) {
-        this.name = name;
-        this.desc = desc;
-        this.takable = takable;
-        this.action = action;
-      }
-    }
-
-    //item class
-    const note = new Item(
-      "Note",
-      'Hand written note that is attached the entry gate that reads ,"We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will let get through the door at the end of the cul-de-sac and into the tunnel and make your way to Paradise Cove and make sure to throw the key into the corner for others to find and re-lock hatch the "',
-      false,
-      () => {
-        console.log(
-          "Don't be greedy,leave this here for other people to come to safety"
-        );
-      }
+//item class
+const note = new Item(
+  "Note",
+  'Hand written note that is attached the entry gate that reads ,"We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will let get through the door at the end of the cul-de-sac and into the tunnel and make your way to Paradise Cove and make sure to throw the key into the corner for others to find and re-lock hatch the "',
+  false,
+  () => {
+    console.log(
+      "Don't be greedy,leave this here for other people to come to safety"
     );
-    const backpack = new Item(
-      "Backpack",
-      "A weathered but usable backpack blue",
-      true,
-      () => {
-        /* write a function to take backpack*/
-      }
-    );
-    const key = new Item("Key", "a standard padlock key", true, () => {
-      /* write function here to unlock padlock */
-    });
-    const flashlight = new Item(
-      "Flashlight",
-      "A dim but functional flashlight. Just bright enough to lead the way!",
-      true,
-      () => {
-        /* need to write a function for the use of the flashlight */
-      }
-    );
-    const runningShoes = new Item(
-      "Running shoes",
-      "A pair of blue PF Flyers, They're guaranteed to make you run faster and job higher!",
-      true,
-      () => {
-        /* write a function to take shoes and add time to timer*/
-      }
-    );
-    const rug = new Item(
-      "Rug",
-      "An out of place cheap looking throw rug about 3x6 in size.",
-      true,
-      () => {
-        /* write function to move rug*/
-      }
-    );
-    const padlock = new Item("Padlock", "Just a standard pad lock.", true, () => {
-      /* write a function to unlock padlock*/
-    });
+  }
+);
+const backpack = new Item(
+  "Backpack",
+  "A weathered but usable backpack blue",
+  true,
+  () => {
+    /* write a function to take backpack*/
+  }
+);
+const key = new Item("Key", "a standard padlock key", true, () => {
+  /* write function here to unlock padlock */
+});
+const flashlight = new Item(
+  "Flashlight",
+  "A dim but functional flashlight. Just bright enough to lead the way!",
+  true,
+  () => {
+    /* need to write a function for the use of the flashlight */
+  }
+);
+const runningShoes = new Item(
+  "Running shoes",
+  "A pair of blue PF Flyers, They're guaranteed to make you run faster and job higher!",
+  true,
+  () => {
+    /* write a function to take shoes and add time to timer*/
+  }
+);
+const rug = new Item(
+  "Rug",
+  "An out of place cheap looking throw rug about 3x6 in size.",
+  true,
+  () => {
+    /* write function to move rug*/
+  }
+);
+const padlock = new Item("Padlock", "Just a standard pad lock.", true, () => {
+  /* write a function to unlock padlock*/
+});
 
-    //lookup table
-    let itemLookUp = {
-      note: note,
-      backpack: backpack,
-      key: key,
-      flashlight: flashlight,
-      runningShoes: runningShoes,
-      rug: rug,
-      padlock: padlock,
-    };
+//lookup table
+let itemLookUp = {
+  note: note,
+  backpack: backpack,
+  key: key,
+  flashlight: flashlight,
+  runningShoes: runningShoes,
+  rug: rug,
+  padlock: padlock,
+};
 
-    //---------------------State Machine------------------------------------------------- */
-    let enterRooms = {
-      'outside': {
-        canChangeTo: ['kitchen']
-      },
-      'kitchen': {
-        canChangeTo: ['outside', 'livingRoom', 'gazebo']
-      },
-      'livingRoom': {
-        canChangeTo: ['kitchen']
-      },
-      'gazebo': {
-        canChangeTo: ['mansion', 'kitchen', 'ballRoom']
-      },
-      'mansion': {
-        canChangeTo: ['gazebo']
-      },
-      'ballRoom': {
-        canChangeTo: ['bedRoom', 'gazebo']
-      },
-      'bedRoom': {
-        canChangeTo: ['bathRoom', 'ballRoom']
-      }
-    }
-    let currentRoom = 'outside'
+//---------------------State Machine------------------------------------------------- */
+let enterRooms = {
+  'outside': {
+    canChangeTo: ['kitchen']
+  },
+  'kitchen': {
+    canChangeTo: ['outside', 'livingRoom', 'gazebo']
+  },
+  'livingRoom': {
+    canChangeTo: ['kitchen']
+  },
+  'gazebo': {
+    canChangeTo: ['mansion', 'kitchen', 'ballRoom']
+  },
+  'mansion': {
+    canChangeTo: ['gazebo']
+  },
+  'ballRoom': {
+    canChangeTo: ['bedRoom', 'gazebo']
+  },
+  'bedRoom': {
+    canChangeTo: ['bathRoom', 'ballRoom']
+  }
+}
+let currentRoom = 'outside'
 
-    function changeRooms(newRoom) {
-      let roomTransitions = enterRooms[currentRoom].canChangeTo;
-      if (roomLookUp[newRoom].locked === true) {
-        console.log('The door is locked, move along!');
-      } else if (roomTransitions.includes(newRoom)) {
-        currentRoom = newRoom;
-        let stateForTable = roomLookUp[currentRoom]
-        console.log(stateForTable.desc);
-        zombieHoarde()
-        console.log("You better hurry up they're getting closer!" + player.encroacment);
-        player.location = roomLookUp[currentRoom]
-      } else {
-        console.log('You can not make that move from' + currentRoom + 'to' + newRoom)
-      }
-    }
-    /*----------------------------------Story--------------------------------------------*/
-    async function intro() {
-      const introMessage = `Welcome to the Zombie Apocalypse! Zombies are all around and closing in fast! Please word your actions in a [action] + [Item/Room] format`;
-      let startPrompt = await ask(introMessage + "\n" + "Do you understand?\n>_");
-      let cleanStart = cleanWords(startPrompt);
-      if (cleanStart === "yes") {
-        start();
-      } else {
-        console.log("Come back when you're ready then!");
-        process.exit();
-      }
-    }
+function changeRooms(newRoom) {
+  let roomTransitions = enterRooms[currentRoom].canChangeTo;
+  if (roomLookUp[newRoom].locked === true) {
+    console.log('The door is locked, move along!');
+  } else if (roomTransitions.includes(newRoom)) {
+    currentRoom = newRoom;
+    let stateForTable = roomLookUp[currentRoom]
+    console.log(stateForTable.desc);
+    zombieHoarde()
+    console.log("You better hurry up they're getting closer!" + player.encroacment);
+    player.location = roomLookUp[currentRoom]
+  } else {
+    console.log('You can not make that move from' + currentRoom + 'to' + newRoom)
+  }
+}
+/*----------------------------------Story--------------------------------------------*/
+async function intro() {
+  const introMessage = `Welcome to the Zombie Apocalypse! Zombies are all around and closing in fast! Please word your actions in a [action] + [Item/Room] format`;
+  let startPrompt = await ask(introMessage + "\n" + "Do you understand?\n>_");
+  let cleanStart = cleanWords(startPrompt);
+  if (cleanStart === "yes") {
+    start();
+  } else {
+    console.log("Come back when you're ready then!");
+    process.exit();
+  }
+}
 
-    intro();
+intro();
 
-    async function start() {
-      const startMessage = `After some time running through woods, you come upon a gated community that looks overrun and long abandoned. The gate is loosely held together by some rusted chains with a note that reads: “We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will unlock the mansion at the end of the cul-de-sac and will give you access to the tunnel and make your way to Paradise Cove. Hurry, once the gates are open there is no way to close them and ‘they’ will get in!
+async function start() {
+  const startMessage = `After some time running through woods, you come upon a gated community that looks overrun and long abandoned. The gate is loosely held together by some rusted chains with a note that reads: “We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will unlock the mansion at the end of the cul-de-sac and will give you access to the tunnel and make your way to Paradise Cove. Hurry, once the gates are open there is no way to close them and ‘they’ will get in!
   
   What would like you to do?`;
 
-      console.log(startMessage);
-      player.location = outside
-      while (player.encroachment > 0) {
-        let dirtyInput = await ask('>_')
-        let cleanInput = cleanWords(dirtyInput)
-        let cleanArray = cleanInput.split(' ')
-        let command = cleanArray[0]
-        let activity = cleanArray[cleanArray.length - 1]
-        if (cleanInput === 'i') {
-          if (player.location.inv.length === 0) {
-            console.log("There is nothing here")
-          } else {
-            player.location.inv.forEach(function (obj) {
-              console.log(obj)
-            })
-          }
-        } else if (cleanInput === 'c') {
-          if (player.inventory.length === 0) {
-            console.log("There is nothing in your pockets.")
-          } else {
-            player.inventory.forEach(function (obj) {
-              console.log(obj)
-            })
-          }
-        } else if (actions.move.includes(command)) {
-          changeRooms(activity)
-        } else {
-          console.log("I'm not too sure how to do " + cleanInput + ". Care to try again?")
-        }
+  console.log(startMessage);
+  player.location = outside
+  while (player.encroachment > 0) {
+    let dirtyInput = await ask('>_')
+    let cleanInput = cleanWords(dirtyInput)
+    let cleanArray = cleanInput.split(' ')
+    let command = cleanArray[0]
+    let activity = cleanArray[cleanArray.length - 1]
+    if (cleanInput === 'i') {
+      if (player.location.inv.length === 0) {
+        console.log("There is nothing here")
+      } else {
+        player.location.inv.forEach(function (obj) {
+          console.log(obj)
+        })
       }
+    } else if (cleanInput === 'c') {
+      if (player.inventory.length === 0) {
+        console.log("There is nothing in your pockets.")
+      } else {
+        player.inventory.forEach(function (obj) {
+          console.log(obj)
+        })
+      }
+    } else if (actions.move.includes(command)) {
+      changeRooms(activity)
+    } else {
+      console.log("I'm not too sure how to do " + cleanInput + ". Care to try again?")
     }
+  }
+}
