@@ -14,9 +14,9 @@ function ask(questionText) {
 /*-------------------------Constants----------------------------------*/
 const actions = {
   move: ["move", "go", "walk", "run"],
-  consume: ["eat", "consume"],
+  consume: ["eat", "consume", "use", "wear"],
   grab: ["grab", "take"],
-  unlock: ["unlock", "use"],
+  unlock: ["unlock"],
   examine: ["read", "examine"],
 };
 
@@ -79,14 +79,14 @@ const bathRoom = new Room(
 mansion.locked = true;
 
 let roomLookUp = {
-  outside: outside,
-  kitchen: kitchen,
-  livingRoom: livingRoom,
-  gazebo: gazebo,
-  mansion: mansion,
-  ballRoom: ballRoom,
-  bedRoom: bedRoom,
-  bathRoom: bathRoom,
+  'outside': outside,
+  'kitchen': kitchen,
+  'livingRoom': livingRoom,
+  'gazebo': gazebo,
+  'mansion': mansion,
+  'ballRoom': ballRoom,
+  'bedRoom': bedRoom,
+  'bathRoom': bathRoom,
 };
 
 /*------------------------Gameplay Functions-------------------------*/
@@ -95,7 +95,7 @@ function cleanWords(word) {
   return steralize;
 }
 
-function zombieHoarde() {
+function zombieHorde() {
   if (player.encroacment >= 0) {
     player.encroacment = player.encroacment - 1;
     if (player.encroacment === 12) {
@@ -117,22 +117,45 @@ function zombieHoarde() {
   }
 }
 
-function takeItem() {
-  if (this.takable) {
-    inventory.push(item.name)
-    return 'You picked up ${this.name}'
+function hordeGain() {
+  if (player.inventory.includes(word) && word === 'runningShoes') {
+    encroachment = 20
+    console.log("Your new kicks allow you to put some distance between yourself and the zombies!")
   } else {
-    return "You can't take that!"
+    console.log("You can\'t use that")
   }
 }
 
-function use() {
-  if (this.name === 'padlock' && inventory.includes('key')) {
-    return 'You unlocked the padlock! Now quickly make your way into the tunnel and make your way to Paradise Cove'
-  } else {
-    return this.action('You need the key to do that')
+
+function takeItem(word) {
+  let pickUpItem = itemLookUp[word]
+  if (pickUpItem.takeable === true && player.location.inv.includes(word)) {
+    player.location.inv.splice(player.location.inv.indexOf(word), 1)
+    player.inventory.push(word)
+    console.log("You picked up " + word)
+  }
+  else {
+    console.log("This is not your to take!")
   }
 }
+
+function unlock(word) {
+  if (player.inventory.includes('key')) {
+    currentState.locked = false
+    console.log("You unlocked the padlock! Now quickly make your way into the tunnel and make your way to Paradise Cove")
+  } else {
+    console.log("You don\'t have a key to do that")
+
+  }
+}
+
+function examine(word) {
+  let lookAt = itemLookUp[word]
+  if (player.location.inv.includes(word)) {
+    console.log(lookAt.desc)
+  }
+}
+
 
 /*----------------------------Player-------------------------------*/
 const player = {
@@ -247,7 +270,7 @@ function changeRooms(newRoom) {
     currentRoom = newRoom;
     let stateForTable = roomLookUp[currentRoom]
     console.log(stateForTable.desc);
-    zombieHoarde()
+    zombieHorde()
     console.log("You better hurry up they're getting closer!" + player.encroacment);
     player.location = roomLookUp[currentRoom]
   } else {
@@ -300,6 +323,14 @@ async function start() {
       }
     } else if (actions.move.includes(command)) {
       changeRooms(activity)
+    } else if (actions.grab.includes(word)) {
+      takeItem(activity)
+    } else if (actions.consume.includes(word)) {
+      hordeGain(activity)
+    } else if (actions.unlock.includes(word)) {
+      unlock(activity)
+    } else if (actions.examine.includes(word)) {
+      examine(activity)
     } else {
       console.log("I'm not too sure how to do " + cleanInput + ". Care to try again?")
     }
