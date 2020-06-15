@@ -1,4 +1,4 @@
-/* --------------------------------Readline------------------------------------*/
+/* -------------------------------------Readline-----------------------------------------*/
 const readline = require("readline");
 const readlineInterface = readline.createInterface(
   process.stdin,
@@ -7,11 +7,92 @@ const readlineInterface = readline.createInterface(
 
 function ask(questionText) {
   return new Promise((resolve, reject) => {
-    readlineInterface.question(questionText, resolve);
-  });
+    readlineInterface.question(questionText, resolve)
+  })
 }
 
+/*-------------------------------Gameplay Functions--------------------------------*/
+//steralizes user inoput to check against command word bank
+function cleanWords(word) {
+  let steralize = word.toString().trim().toLowerCase();
+  return steralize;
+}
+//function that counts down until the impeding zombie horde kills the player
+function zombieHorde() {
+  if (player.encroacment >= 0) {
+    player.encroacment = player.encroacment - 1;
+    if (player.encroacment === 12) {
+      console.log(
+        "You can hear the sound the zombie hoarde growing louder and louder"
+      );
+    }
+    if (player.encroacment <= 6 && player.encroacment > 0) {
+      console.log(
+        "You can see the zombies slowly moving towards you, they are now focused on you!"
+      );
+    }
+    if (player.encroacment === 0) {
+      console.log(
+        "The zombies have gotten you and added you to their ranks. Enjoy the brains!"
+      );
+      process.exit();
+    }
+  }
+}
+
+//uses item to create space from the horde
+function hordeGain() {
+  if (player.inventory.includes(word) && word === 'runningShoes') {
+    encroachment = 20
+    console.log("Your new kicks allow you to put some distance between yourself and the zombies!")
+  } else {
+    console.log("You can't use that")
+  }
+}
+
+//picks up takeable items and stashes them in players array
+function takeItem(word) {
+  let pickUpItem = itemLookUp[word]
+  if (pickUpItem.takeable === true && player.location.inv.includes(word)) {
+    player.location.inv.splice(player.location.inv.indexOf(word), 1)
+    player.inventory.push(word)
+    console.log("You picked up " + word)
+  }
+  else {
+    console.log("This is not your to take!")
+  }
+}
+
+//unlocks final room so player can escape to safety
+function unlock(word) {
+  if (player.inventory.includes('key')) {
+    currentState.locked = false
+    console.log("You unlocked the padlock! Now quickly make your way into the tunnel and make your way to Paradise Cove")
+  } else {
+    console.log("You don't have a key to do that")
+
+  }
+}
+
+//allows plater to examine item
+function examine(word) {
+  let lookAt = itemLookUp[word]
+  if (player.location.inv.includes(word)) {
+    console.log(lookAt.desc)
+  }
+}
+
+
+/*----------------------------Player-------------------------------*/
+//player state 
+const player = {
+  inventory: [],
+  location: null,
+  encroacment: 20,
+};
+
 /*-------------------------Constants----------------------------------*/
+//word bank that triggers action functions
 const actions = {
   move: ["move", "go", "walk", "run"],
   consume: ["eat", "consume", "use", "wear"],
@@ -20,7 +101,69 @@ const actions = {
   examine: ["read", "examine"],
 };
 
-/*--------------------------Rooms------------------------------------*/
+/*----------------------------------------Items---------------------------------------------------------------*/
+//class constructor
+class Item {
+  constructor(name, desc, takable, action) {
+    this.name = name;
+    this.desc = desc;
+    this.takable = takable;
+    this.action = action;
+  }
+}
+
+//items class
+const note = new Item(
+  "Note",
+  'Hand written note that is attached the entry gate that reads ,"We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will let get through the door at the end of the cul-de-sac and into the tunnel and make your way to Paradise Cove and make sure to throw the key into the corner for others to find and re-lock hatch the "',
+  false)
+
+const backpack = new Item(
+  "Backpack",
+  "A weathered but usable backpack blue",
+  true);
+
+const key = new Item("Key",
+  "a standard padlock key",
+  true);
+
+const flashlight = new Item(
+  "Flashlight",
+  "A dim but functional flashlight. Just bright enough to lead the way!",
+  true,
+)
+
+const runningShoes = new Item(
+  "Running shoes",
+  "A pair of blue PF Flyers, They're guaranteed to make you run faster and job higher!",
+  true,
+)
+
+const rug = new Item(
+  "Rug",
+  "An out of place cheap looking throw rug about 3x6 in size.",
+  true,
+)
+
+const padlock = new Item(
+  "Padlock",
+  "Just a standard pad lock.",
+  true
+  )
+
+//lookup table
+let itemLookUp = {
+  'note': note,
+  'backpack': backpack,
+  'key': key,
+  'flashlight': flashlight,
+  'runningShoes': runningShoes,
+  'rug': rug,
+  'padlock': padlock,
+};
+
+/*----------------------------------Rooms---------------------------------------------*/
+//room class constructor
 class Room {
   constructor(name, desc, inv) {
     this.name = name;
@@ -30,6 +173,7 @@ class Room {
   }
 }
 
+//rooms class
 const gate = new Room(
   "Gate",
   "You quickly come upon a gated community that looks to overrun and long abandoned. The gate is loosely held together by some rusted chains with a note that reads: “We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will let get through the door at the end of the cul-de-sac and into the tunnel and make your way to Paradise Cove. Hurry, once the gates are open there is no way to close them and ‘they’ will get in.",
@@ -76,8 +220,10 @@ const bathRoom = new Room(
   [rug, padlock]
 );
 
+//setting mansion to locked
 mansion.locked = true;
 
+//room lookup table
 let roomLookUp = {
   'outside': outside,
   'kitchen': kitchen,
@@ -89,154 +235,9 @@ let roomLookUp = {
   'bathRoom': bathRoom,
 };
 
-/*------------------------Gameplay Functions-------------------------*/
-function cleanWords(word) {
-  let steralize = word.toString().trim().toLowerCase();
-  return steralize;
-}
 
-function zombieHorde() {
-  if (player.encroacment >= 0) {
-    player.encroacment = player.encroacment - 1;
-    if (player.encroacment === 12) {
-      console.log(
-        "You can hear the sound the zombie hoarde growing louder and louder"
-      );
-    }
-    if (player.encroacment <= 6 && player.encroacment > 0) {
-      console.log(
-        "You can see the zombies slowly moving towards you, they are now focused on you!"
-      );
-    }
-    if (player.encroacment === 0) {
-      console.log(
-        "The zombies have gotten you and added you to their ranks. Enjoy the brains!"
-      );
-      process.exit();
-    }
-  }
-}
-
-function hordeGain() {
-  if (player.inventory.includes(word) && word === 'runningShoes') {
-    encroachment = 20
-    console.log("Your new kicks allow you to put some distance between yourself and the zombies!")
-  } else {
-    console.log("You can\'t use that")
-  }
-}
-
-
-function takeItem(word) {
-  let pickUpItem = itemLookUp[word]
-  if (pickUpItem.takeable === true && player.location.inv.includes(word)) {
-    player.location.inv.splice(player.location.inv.indexOf(word), 1)
-    player.inventory.push(word)
-    console.log("You picked up " + word)
-  }
-  else {
-    console.log("This is not your to take!")
-  }
-}
-
-function unlock(word) {
-  if (player.inventory.includes('key')) {
-    currentState.locked = false
-    console.log("You unlocked the padlock! Now quickly make your way into the tunnel and make your way to Paradise Cove")
-  } else {
-    console.log("You don\'t have a key to do that")
-
-  }
-}
-
-function examine(word) {
-  let lookAt = itemLookUp[word]
-  if (player.location.inv.includes(word)) {
-    console.log(lookAt.desc)
-  }
-}
-
-
-/*----------------------------Player-------------------------------*/
-const player = {
-  inventory: [],
-  location: null,
-  encroacment: 20,
-};
-
-/*----------------------------------------Items---------------------------------------------------------------*/
-//class constructor
-class Item {
-  constructor(name, desc, takable, action) {
-    this.name = name;
-    this.desc = desc;
-    this.takable = takable;
-    this.action = action;
-  }
-}
-
-//item class
-const note = new Item(
-  "Note",
-  'Hand written note that is attached the entry gate that reads ,"We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will let get through the door at the end of the cul-de-sac and into the tunnel and make your way to Paradise Cove and make sure to throw the key into the corner for others to find and re-lock hatch the "',
-  false,
-  () => {
-    console.log(
-      "Don't be greedy,leave this here for other people to come to safety"
-    );
-  }
-);
-const backpack = new Item(
-  "Backpack",
-  "A weathered but usable backpack blue",
-  true,
-  () => {
-    /* write a function to take backpack*/
-  }
-);
-const key = new Item("Key", "a standard padlock key", true, () => {
-  /* write function here to unlock padlock */
-});
-const flashlight = new Item(
-  "Flashlight",
-  "A dim but functional flashlight. Just bright enough to lead the way!",
-  true,
-  () => {
-    /* need to write a function for the use of the flashlight */
-  }
-);
-const runningShoes = new Item(
-  "Running shoes",
-  "A pair of blue PF Flyers, They're guaranteed to make you run faster and job higher!",
-  true,
-  () => {
-    /* write a function to take shoes and add time to timer*/
-  }
-);
-const rug = new Item(
-  "Rug",
-  "An out of place cheap looking throw rug about 3x6 in size.",
-  true,
-  () => {
-    /* write function to move rug*/
-  }
-);
-const padlock = new Item("Padlock", "Just a standard pad lock.", true, () => {
-  /* write a function to unlock padlock*/
-});
-
-//lookup table
-let itemLookUp = {
-  note: note,
-  backpack: backpack,
-  key: key,
-  flashlight: flashlight,
-  runningShoes: runningShoes,
-  rug: rug,
-  padlock: padlock,
-};
-
-//---------------------State Machine------------------------------------------------- */
+/*---------------------------------State Machine------------------------------------------------- */
+//actual state machine
 let enterRooms = {
   'outside': {
     canChangeTo: ['kitchen']
@@ -260,8 +261,11 @@ let enterRooms = {
     canChangeTo: ['bathRoom', 'ballRoom']
   }
 }
+
+//game start location
 let currentRoom = 'outside'
 
+//fumction that allows room transitions
 function changeRooms(newRoom) {
   let roomTransitions = enterRooms[currentRoom].canChangeTo;
   if (roomLookUp[newRoom].locked === true) {
@@ -277,7 +281,9 @@ function changeRooms(newRoom) {
     console.log('You can not make that move from' + currentRoom + 'to' + newRoom)
   }
 }
+
 /*----------------------------------Story--------------------------------------------*/
+//intro asking if the player would like to play
 async function intro() {
   const introMessage = `Welcome to the Zombie Apocalypse! Zombies are all around and closing in fast! Please word your actions in a [action] + [Item/Room] format`;
   let startPrompt = await ask(introMessage + "\n" + "Do you understand?\n>_");
@@ -291,9 +297,9 @@ async function intro() {
 }
 
 intro();
-
+// game start
 async function start() {
-  const startMessage = `After some time running through woods, you come upon a gated community that looks overrun and long abandoned. The gate is loosely held together by some rusted chains with a note that reads: “We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will unlock the mansion at the end of the cul-de-sac and will give you access to the tunnel and make your way to Paradise Cove. Hurry, once the gates are open there is no way to close them and ‘they’ will get in!
+  const startMessage = `After some time running through woods, you come upon a gated community that looks overrun and long abandoned. The gate is losely held together by some rusted chains with a note that reads: “We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will unlock the mansion at the end of the cul-de-sac and will give you access to the tunnel and make your way to Paradise Cove. Hurry, once the gates are open there is no way to close them and ‘they’ will get in!
   
   What would like you to do?`;
 
