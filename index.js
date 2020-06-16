@@ -39,12 +39,12 @@ const gate = new Room(
 const outside = new Room(
   "Outside",
   "Once you open the chains and push through the large gates, you see what is left of what was a nice gated community, but is now run down, burnt out or worse. On the left side of the street is a burnt shell of a house next to a decrepit old house with boarded up windows and what looks like a working front door. On the right side of the street are two houses, one is boarded up and wrapped in barbed wire, while the other sits barely touched. At the end of the cul-de-sac stands a giant white mansion, with giant marble columns and red door. There is a weathered but usable backpack",
-  ['backpack']
+  ["backpack"]
 );
 const kitchen = new Room(
   "kitchen",
   "Is just off the main entrance to the south. Where in the main hall there is a grand stair-way that is blocked by the roof that has collapsed and there’re terracotta tiles broken and strewn about.  The kitchen is very large. There is wall to wall cabinets from floor to ceiling covering most of the wall space. The cabinets are white in color and there isn't a single drawer or door or a single door on any of the cabinets.The cabinets are on the east, north and west side walls  In the center there is a very large island containing the stainless steel stove and propane grill cook station.The west side wall contains an large archway opening to what appears to be a living room.The east side wall contains a small but solid wooden door that has been boarded up and the boards are unable to be removed.The north side wall contains only cabinets.High up on a shelf there is what appears to be a brand new pair of PF Flyers running shoes.They are, Guaranteed to make you run faster and jump higher!",
-  ['runningShoes, key']
+  ["runningShoes, key"]
 );
 const livingRoom = new Room(
   "Livingroom",
@@ -54,7 +54,7 @@ const livingRoom = new Room(
 const gazebo = new Room(
   "gazebo",
   "At the Center of the gated community and it is made out a white marble. All houses lead to the gazebo There are solid marble benches all the way around and odd on the south side bench there’s a random flashlight that actually still works just laying on the bench.",
-  ['flashlight']
+  ["flashlight"]
 );
 const mansion = new Room(
   "mansion",
@@ -76,8 +76,6 @@ const bathRoom = new Room(
   "You enter through the north and the bathroom is floor to ceiling White Italian Marble. On the east wall there's a large double sink coming out of the wall that’s long enough to lay down in.The west wall contains a single cherry door that is locked. Oddly there is no toilet in the bathroom.The whole south side of the bathroom is a massive glassed walk -in shower.There must be 100 wall and ceiling water jets in the shower room.On the floor there’s an out of place looking cheap throw rug.You move the throw to discover a grate in the floor just big enough for a man to fit in that’s padlocked shut. Use the key to open the lock and enter the tunnel to exit.",
   ['rug, padlock']
 );
-
-mansion.locked = true;
 
 let roomLookUp = {
   'outside': outside,
