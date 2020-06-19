@@ -6,7 +6,7 @@ const readlineInterface = readline.createInterface(
 );
 
 function ask(questionText) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     readlineInterface.question(questionText, resolve)
   })
 }
@@ -96,19 +96,19 @@ function cleanWords(word) {
 }
 //function that counts down until the impeding zombie horde kills the player
 function zombieHorde() {
-  if (player.encroacment >= 0) {
-    player.encroacment = player.encroacment - 1;
-    if (player.encroacment === 12) {
+  if (player.encroachment >= 0) {
+    player.encroachment = player.encroachment - 1;
+    if (player.encroachment === 12) {
       console.log(
         "You can hear the sound the zombie hoarde growing louder and louder"
       );
     }
-    if (player.encroacment <= 6 && player.encroacment > 0) {
+    if (player.encroachment <= 6 && player.encroachment > 0) {
       console.log(
         "You can see the zombies slowly moving towards you, they are now focused on you!"
       );
     }
-    if (player.encroacment === 0) {
+    if (player.encroachment === 0) {
       console.log(
         "The zombies have gotten you and added you to their ranks. Enjoy the brains!"
       );
@@ -133,7 +133,6 @@ function hordeGain() {
 //picks up takeable items and stashes them in players array
 function takeItem(word) {
 
-
   let pickUpItem = itemLookUp[word]
   if (pickUpItem.takeable === true && player.location.inv.includes(word)) {
     player.location.inv.splice(player.location.inv.indexOf(word), 1)
@@ -145,7 +144,7 @@ function takeItem(word) {
 }
 
 //unlocks final room so player can escape to safety
-function unlock(word) {
+function unlock(_word) {
 
 
   if (player.inventory.includes('key')) {
@@ -171,7 +170,7 @@ function examine(word) {
 const player = {
   inventory: [],
   location: null,
-  encroacment: 20,
+  encroachment: 20,
 };
 /*----------------------------------------Items---------------------------------------------------------------*/
 //class constructor
@@ -269,7 +268,7 @@ let enterRooms = {
 //game start location
 let currentRoom = 'outside'
 
-//fumction that allows room transitions
+//function that allows room transitions
 function changeRooms(newRoom) {
   let roomTransitions = enterRooms[currentRoom].canChangeTo;
   if (roomLookUp[newRoom].locked === true) {
@@ -279,7 +278,7 @@ function changeRooms(newRoom) {
     let stateForTable = roomLookUp[currentRoom]
     console.log(stateForTable.desc);
     zombieHorde()
-    console.log("You better hurry up they're getting closer!" + player.encroacment);
+    console.log("You better hurry up they're getting closer!" + player.encroachment);
     player.location = roomLookUp[currentRoom]
   } else {
     console.log('You can not make that move from' + currentRoom + 'to' + newRoom)
@@ -303,11 +302,11 @@ async function intro() {
 intro();
 // game start
 async function start() {
-  const startMessage = `After some time running through woods, you come upon a gated community that looks overrun and long abandoned. The gate is losely held together by some rusted chains with a note that reads: “We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will unlock the mansion at the end of the cul-de-sac and will give you access to the tunnel and make your way to Paradise Cove. Hurry, once the gates are open there is no way to close them and ‘they’ will get in!
+  const startMessage = `After some time running through woods, you come upon a gated community that looks overrun and long abandoned. The gate is loosely held together by some rusted chains with a note that reads: “We have safety and supplies beyond the town through the tunnel, there is a key in one of the houses that will unlock the mansion at the end of the cul-de-sac and will give you access to the tunnel and make your way to Paradise Cove. Hurry, once the gates are open there is no way to close them and ‘they’ will get in!
   
-  What would like you to do?`;
+   What would like you to do?`;
 
-  console.log(startMessage);
+  console.log = (startMessage);
   player.location = outside
   while (player.encroachment > 0) {
     let dirtyInput = await ask('>_')
@@ -333,13 +332,13 @@ async function start() {
       }
     } else if (actions.move.includes(command)) {
       changeRooms(activity)
-    } else if (actions.grab.includes(word)) {
+    } else if (actions.grab.includes(cleanWords)) {
       takeItem(activity)
-    } else if (actions.consume.includes(word)) {
+    } else if (actions.consume.includes(cleanWords)) {
       hordeGain(activity)
-    } else if (actions.unlock.includes(word)) {
+    } else if (actions.unlock.includes(cleanWords)) {
       unlock(activity)
-    } else if (actions.examine.includes(word)) {
+    } else if (actions.examine.includes(cleanWords)) {
       examine(activity)
     } else {
       console.log("I'm not too sure how to do " + cleanInput + ". Care to try again?")
